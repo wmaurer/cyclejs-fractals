@@ -1,0 +1,23 @@
+{
+  "name": "cyclejs-fractals",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@types/d3-scale": "^1.0.5",
+    "cycle-scripts-ts-webpack": "0.3.1"
+  },
+  "dependencies": {
+    "@cycle/dom": "^14.3.0",
+    "@cycle/xstream-run": "^4.2.0",
+    "csstips": "0.0.3",
+    "d3-scale": "^1.0.4",
+    "typestyle": "^0.22.0",
+    "xstream": "^9.2.0"
+  },
+  "scripts": {
+    "start": "cycle-scripts start",
+    "test": "cycle-scripts test",
+    "build": "cycle-scripts build",
+    "eject": "cycle-scripts eject"
+  }
+}
