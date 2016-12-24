@@ -47,7 +47,7 @@ export function App(sources: Sources): Sinks {
             x: svgDimensions.width / 2 - 40,
             y: svgDimensions.height - 80,
             lvl: 0,
-            maxlvl,
+            maxlvl: maxlvl + 1,
             left: false,
             right: false
         }));
