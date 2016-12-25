@@ -27,11 +27,12 @@ const svgDimensions = {
 const realMax = 11;
 
 export function App(sources: Sources): Sinks {
+    const scaleFactor = scaleLinear().domain([svgDimensions.height, 0]).range([0, .8]);
+    const scaleLean = scaleLinear().domain([0, svgDimensions.width / 2, svgDimensions.width]).range([.5, 0, -.5]);
+
     const factorAndLean$ = sources.DOM.select('#the-svg').events('mousemove')
         .map((mouseEvent: MouseEvent) => {
             const { offsetX: x, offsetY: y } = mouseEvent;
-            const scaleFactor = scaleLinear().domain([svgDimensions.height, 0]).range([0, .8]);
-            const scaleLean = scaleLinear().domain([0, svgDimensions.width / 2, svgDimensions.width]).range([.5, 0, -.5]);
             return {
                 heightFactor: scaleFactor(y),
                 lean: scaleLean(x)
