@@ -1,4 +1,4 @@
-import { VNode, svg, h } from '@cycle/dom'
+import { VNode, svg } from '@cycle/dom'
 import { DOMSource } from '@cycle/dom/xstream-typings'
 import xs, { Stream } from 'xstream'
 import { interpolateViridis } from 'd3-scale';
@@ -90,8 +90,8 @@ function pythagoras({ w, x, y, heightFactor, lean, left = false, right = false, 
         right: true
     };
 
-    return h('g', { attrs: { transform: `translate(${x} ${y}) ${rotate}` } }, [
-        h('rect', { attrs: { width: w, height: w, x: 0, y: 0, style: `fill: ${interpolateViridis(lvl / maxlvl)}` } }),
+    return svg.g({ attrs: { transform: `translate(${x} ${y}) ${rotate}` } }, [
+        svg.rect({ attrs: { width: w, height: w, x: 0, y: 0, style: `fill: ${interpolateViridis(lvl / maxlvl)}` } }),
         pythagoras(leftArgs),
         pythagoras(rightArgs)
     ])

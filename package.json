@@ -10,9 +10,10 @@
     "@cycle/dom": "^14.3.0",
     "@cycle/xstream-run": "^4.2.0",
     "csstips": "0.0.3",
+    "csx": "^8.2.1",
     "d3-scale": "^1.0.4",
-    "typestyle": "^0.22.0",
-    "xstream": "^9.2.0"
+    "typestyle": "0.22.0",
+    "xstream": "^9.3.0"
   },
   "scripts": {
     "start": "cycle-scripts start",

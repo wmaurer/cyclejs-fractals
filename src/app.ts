@@ -1,15 +1,17 @@
-import { VNode, div, h2, svg, p, img } from '@cycle/dom';
+import { VNode, div, h2, svg, a, img } from '@cycle/dom';
 import { DOMSource } from '@cycle/dom/xstream-typings';
-import sampleCombine from 'xstream/extra/sampleCombine';
+import throttle from 'xstream/extra/throttle';
 import xs, { Stream } from 'xstream';
-import { Styles } from './app.styles';
+import { Styles, setupApplicationBaseStyles } from './app.styles';
 import { normalize, setupPage } from 'csstips';
 import { scaleLinear } from 'd3-scale';
 
 import { Pythagoras } from './pythagoras';
+import { Throttle } from './throttle';
 
 normalize();
 setupPage('#app');
+setupApplicationBaseStyles();
 
 export type Sources = {
     DOM: DOMSource;
@@ -30,7 +32,14 @@ export function App(sources: Sources): Sinks {
     const scaleFactor = scaleLinear().domain([svgDimensions.height, 0]).range([0, .8]);
     const scaleLean = scaleLinear().domain([0, svgDimensions.width / 2, svgDimensions.width]).range([.5, 0, -.5]);
 
-    const factorAndLean$ = sources.DOM.select('#the-svg').events('mousemove')
+    const throttleSinks = Throttle(sources);
+
+    const mouseEvent$ = sources.DOM.select('#the-svg').events('mousemove');
+
+    const throttledMouseEvent$ = throttleSinks.throttle
+        .map(v => throttle(v)(mouseEvent$)).flatten();
+
+    const factorAndLean$ = throttledMouseEvent$
         .map((mouseEvent: MouseEvent) => {
             const { offsetX: x, offsetY: y } = mouseEvent;
             return {
@@ -55,17 +64,32 @@ export function App(sources: Sources): Sinks {
 
     const pythagoras$ = Pythagoras(args$);
 
-    const vtree$ = pythagoras$.map(x =>
-        div(Styles.App, [
-            div(Styles.AppHeader, [
-                img(Styles.AppLogo, { attrs: { src: 'cyclejs_logo.svg' } }),
-                h2('This is a dancing Pythagoras tree')
-            ]),
-            p(Styles.AppIntro, [
-                svg('#the-svg', { attrs: { height: svgDimensions.height, width: svgDimensions.width, style: 'border: 1px solid lightgray' } }, [ x ])
+    const vtree$ = xs.combine(pythagoras$, throttleSinks.DOM)
+        .map(([pythagoras, throttle]) =>
+            div(Styles.App, [
+                div(Styles.AppHeader, [
+                    img(Styles.AppLogo, { attrs: { src: 'cyclejs_logo.svg' } }),
+                    h2(Styles.Heading, 'This is a dancing Pythagoras tree')
+                ]),
+                div(Styles.AppIntro, [
+                    ...throttle,
+                    svg('#the-svg',
+                        { attrs: { height: svgDimensions.height, width: svgDimensions.width, style: 'border: 1px solid lightgray; margin: 0.5em 0 0.75em;' } },
+                        [pythagoras]
+                    ),
+                    div(Styles.Credits, [
+                        'Built by ',
+                        a({ attrs: { href: 'http://twitter.com/waynemaurer' } }, ['@waynemaurer']),
+                        ' with ',
+                        a({ attrs: { href: 'http://cycle.js.org' } }, ['Cycle.js']),
+                        ' and ',
+                        a({ attrs: { href: 'http://typestyle.io' } }, ['Typestyle']),
+                        '. Source code ',
+                        a({ attrs: { href: 'http://github.com/wmaurer/cyclejs-fractals/' } }, ['here'])
+                    ])
+                ])
             ])
-        ])
-    );
+        );
 
     return {
         DOM: vtree$
